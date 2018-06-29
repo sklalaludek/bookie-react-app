@@ -17,3 +17,5 @@ fetch('https://itunes.apple.com/search?term=Harry+Potter&entity=movie,ebook')
 .then(resp => resp.json())
 .then(data => console.log(data.results))
 ```
+
+REVIEWS API: https://idreambooks.com/api/books/reviews.json?q=Harry+Potter&key=b21861bfcf56827ee73008019c030c5392d6f186
