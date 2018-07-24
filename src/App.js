@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
 import './App.css';
+import Search from './components/Search';
 
 class App extends Component {
   constructor() {
     super()
     this.state = {
       movies: [],
-      books: []
+      books: [],
+      value: ''
     }
+  }
+
+  handleChange = value => {
+    this.setState({ value })
   }
 
   componentDidMount() {
@@ -39,11 +45,7 @@ class App extends Component {
           </a>
         </header>
         <main>
-          <input
-            aria-hidden="true"
-            type="text"
-            placeholder="search"
-          />
+          <Search onInputChange={this.handleChange} value={this.state.value} />
           <div className="results">
             <h2>Movies</h2>
             {
@@ -67,5 +69,6 @@ class App extends Component {
     );
   }
 }
+
 
 export default App;
