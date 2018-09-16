@@ -4,30 +4,41 @@ import Search from './../components/Search';
 class Home extends Component {
   constructor() {
     super()
+    this.input = React.createRef()
     this.state = {
-      movies: [],
-      books: [],
-      value: ''
+      content: ''
     }
   }
 
-  handleChange = value => {
-    this.setState({ value })
-  }
-
-  search = () => {
-    fetch(`https://itunes.apple.com/search?term=${this.state.value}&entity=movie,ebook`)
+  handleSubmit = event => {
+    event.preventDefault()
+    const value = this.input.current.value
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=${value}`)
     .then(resp => resp.json())
-    .then(({ results }) => {
-      this.setState({
-        movies: results.filter(e => e.kind.indexOf('movie') > -1),
-        books: results.filter(e => e.kind.indexOf('book') > -1)
-      })
+    .then(({ items }) => {
+      const link = items.length && items.filter(({ volumeInfo: { infoLink } }) => (
+        infoLink.indexOf('https://play.google.com/') !== -1
+      ))[0].volumeInfo.infoLink
+
+      fetch('https://cors-anywhere.herokuapp.com/' + link)
+      .then(resp => resp.text())
+      .then(content => this.setState({ content }, () => this.getSimilar()))
     })
   }
 
-  componentDidUpdate() {
-    this.search()
+  getSimilar = () => {
+    const similarFrame = Array.from(document.querySelectorAll('.uTDLzc.K1b9Kc'))
+      .filter(el => el.querySelector('h2').textContent === 'Podobne')
+    const similarBooks = similarFrame[0] && Array.from(similarFrame[0].querySelectorAll('.IFTL7.XWV5qb > .WHE7ib.mpg5gc .Vpfmgd'))
+      .map(el => ({
+        title: el.querySelector('[title]').title,
+        author: el.querySelector('.b8cIId.ReQCgd.KoLSrc').textContent,
+        image: el.querySelector('img[src]').src
+      }))
+
+    console.log(similarBooks)
+    document.getElementById('similar').innerHTML = ''
+    return similarBooks
   }
 
   render () {
@@ -39,24 +50,9 @@ class Home extends Component {
           </a>
         </header>
         <main>
-          <Search onInputChange={this.handleChange} value={this.state.value} />
+          <Search onInputSubmit={this.handleSubmit} input={this.input} />
           <div className="results">
-            <h2>Movies</h2>
-            {
-              this.state.movies.map(e => (
-                <a href={`/movie_id/${e.trackId}`} key={e.trackId}>
-                  <li>{e.trackName}</li>
-                </a>
-              ))
-            }
-            <h2>Books</h2>
-            {
-              this.state.books.map((e, i) => (
-                <a href={`/book_id/${e.trackId}`} key={e.trackId}>
-                  <li>{e.trackName}</li>
-                </a>
-              ))
-            }
+            <div dangerouslySetInnerHTML={{ __html: this.state.content }} id="similar" />
           </div>
         </main>
       </div>

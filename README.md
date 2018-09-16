@@ -14,4 +14,4 @@ DRIBBBLE PROJECTS:
 * https://dribbble.com/shots/5008302-Books-Application
 * https://dribbble.com/shots/3250481-Shot-Books
 
-https://codepen.io/XVincentX/pen/avRqep
+https://codepen.io/totya24/pen/bAorz
